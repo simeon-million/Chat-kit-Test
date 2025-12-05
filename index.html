@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ChatKit Test</title>
+
+    <script type="module">
+      import ChatKit from "https://cdn.jsdelivr.net/npm/@openai/chatkit@latest/dist/chatkit.js";
+
+      const chat = new ChatKit({
+        api: {
+          url: "https://seeyoutomorrow.app.n8n.cloud/webhook-test/chatkit",
+          auth: { type: "none" }
+        },
+        startScreen: {
+          greeting: "Hey there! How can I help.",
+          prompts: []
+        },
+        composer: {
+          attachments: { enabled: false }
+        },
+      });
+
+      chat.mount("#chat-container");
+    </script>
+  </head>
+
+  <body style="margin: 0; padding: 0;">
+    <div id="chat-container" style="height: 100vh;"></div>
+  </body>
+</html>
