@@ -27,7 +27,6 @@
     const { useState, useRef, useEffect } = React;
 
     // --- CONFIGURATION ---
-    // Ensure this matches your n8n Webhook URL exactly
     const WEBHOOK_URL = "https://seeyoutomorrow.app.n8n.cloud/webhook/chatkit"; 
 
     function App() {
@@ -37,6 +36,9 @@
         const [input, setInput] = useState("");
         const [isLoading, setIsLoading] = useState(false);
         const messagesEndRef = useRef(null);
+
+        // Create a persistent Session ID for this browser tab
+        const sessionIdRef = useRef('session-' + Math.random().toString(36).substr(2, 9));
 
         const scrollToBottom = () => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); };
         useEffect(scrollToBottom, [messages, isLoading]);
@@ -54,44 +56,35 @@
                 const response = await fetch(WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chatInput: userMessage.text })
+                    body: JSON.stringify({ 
+                        chatInput: userMessage.text,
+                        sessionId: sessionIdRef.current // <--- WE ARE NOW SENDING THIS
+                    })
                 });
 
-                // --- ROBUST ERROR HANDLING START ---
-                
-                // 1. Get the raw text first (don't assume it's JSON yet)
                 const rawText = await response.text();
                 
-                if (!response.ok) {
-                    throw new Error(`Server Error: ${response.status} ${response.statusText}`);
-                }
+                if (!response.ok) throw new Error(`Server Error: ${response.status}`);
 
-                // 2. Try to parse it as JSON
                 let botText = "";
                 try {
-                    if (!rawText) throw new Error("Empty response from n8n");
-                    
                     const data = JSON.parse(rawText);
-                    // Look for common n8n output keys
-                    botText = data.output || data.text || data.message || data.response || JSON.stringify(data);
-                } catch (jsonError) {
-                    // 3. If JSON parsing fails, use the raw text if it exists
-                    console.warn("Response was not JSON, using raw text:", rawText);
-                    botText = rawText || "Error: n8n workflow finished but returned no data.";
+                    botText = data.output || data.text || data.message || JSON.stringify(data);
+                } catch (e) {
+                    botText = rawText; 
                 }
-                // --- ROBUST ERROR HANDLING END ---
 
                 setMessages(prev => [...prev, { 
                     id: Date.now() + 1, 
-                    text: typeof botText === 'object' ? JSON.stringify(botText) : botText, 
+                    text: botText, 
                     sender: 'bot' 
                 }]);
 
             } catch (error) {
-                console.error("Connection Error:", error);
+                console.error("Error:", error);
                 setMessages(prev => [...prev, { 
                     id: Date.now() + 1, 
-                    text: `Connection Error: ${error.message}. Check console for details.`, 
+                    text: "Connection Error. Check n8n.", 
                     sender: 'bot',
                     isError: true
                 }]);
