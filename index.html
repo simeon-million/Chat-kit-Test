@@ -1,60 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ChatKit Test Widget</title>
 
-  <!-- ChatKit global bundle (exposes window.ChatKit) -->
-  <script src="https://cdn.jsdelivr.net/npm/@openai/chatkit@latest/dist/chatkit.global.js"></script>
+  <!-- The only bundle that exposes window.ChatKit -->
+  <script src="https://cdn.jsdelivr.net/npm/@openai/chatkit@latest/dist/chatkit.global.js" defer></script>
 
-  <script>
-    // Your ChatKit configuration
-    const options = {
-      api: {
-        url: "https://seeyoutomorrow.app.n8n.cloud/webhook-test/chatkit",
-        auth: { type: "none" }
-      },
-      theme: {
-        colorScheme: 'light',
-        radius: 'pill',
-        density: 'compact',
-        typography: {
-          baseSize: 14,
-          fontFamily: '"OpenAI Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-          fontFamilyMono: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-          fontSources: [
-            {
-              family: 'OpenAI Sans',
-              src: 'https://cdn.openai.com/common/fonts/openai-sans/v2/OpenAISans-Regular.woff2',
-              weight: 400,
-              style: 'normal',
-              display: 'swap'
-            }
-          ]
-        }
-      },
-      composer: {
-        attachments: { enabled: false }
-      },
-      startScreen: {
-        greeting: "Hey there! This is your AI assistant. Ask me anything.",
-        prompts: []
-      }
-    };
-
-    // Wait for the page to load before mounting
+  <script defer>
     window.onload = () => {
-      console.log("ChatKit available?", window.ChatKit);
-      const chat = new window.ChatKit(options);
+      if (!window.ChatKit) {
+        console.error("ChatKit failed to load. Make sure you use chatkit.global.js");
+        return;
+      }
+
+      const chat = new window.ChatKit({
+        api: {
+          url: "https://seeyoutomorrow.app.n8n.cloud/webhook-test/chatkit",
+          auth: { type: "none" }
+        },
+        theme: {
+          colorScheme: 'light',
+          radius: 'pill',
+          density: 'compact',
+          typography: {
+            baseSize: 14,
+            fontFamily: '"OpenAI Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
+          }
+        },
+        composer: { attachments: { enabled: false } },
+        startScreen: { greeting: "Hello! Ask me anything.", prompts: [] }
+      });
+
       chat.mount("#chat-container");
     };
   </script>
 </head>
-
-<body style="margin:0; padding:0;">
+<body style="margin:0;padding:0;">
   <div id="chat-container" style="height:100vh;"></div>
 </body>
-
 </html>
