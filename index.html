@@ -1,34 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ChatKit Test</title>
 
-  <script
-    src="https://cdn.jsdelivr.net/npm/@openai/chatkit@latest/dist/bundle/chatkit.js"
-    defer>
-  </script>
+  <!-- Correct and verified ChatKit CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@openai/chatkit@latest/dist/bundle/index.js"></script>
 
-  <script defer>
-    window.addEventListener("DOMContentLoaded", () => {
+  <script>
+    window.onload = () => {
       const chat = new window.ChatKit({
         api: {
           url: "https://seeyoutomorrow.app.n8n.cloud/webhook-test/chatkit",
           auth: { type: "none" }
         },
         startScreen: {
-          greeting: "Hey! Testing n8n connection.",
+          greeting: "Welcome! Testing n8n integration.",
           prompts: []
         }
       });
 
       chat.mount("#chat-container");
-    });
+    };
   </script>
 </head>
 
-<body style="margin: 0;">
-  <div id="chat-container" style="height: 100vh;"></div>
+<body style="margin:0; padding:0;">
+  <div id="chat-container" style="height:100vh;"></div>
 </body>
+
 </html>
